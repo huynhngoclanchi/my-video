@@ -148,7 +148,7 @@ export const TitleScene: React.FC = () => {
               marginTop: -14,
             }}
           >
-            LỄ CHIA TAY
+            HỌP MẶT
           </div>
         </Reveal>
         <Reveal delay={75}>
