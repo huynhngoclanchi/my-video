@@ -23,7 +23,7 @@ import {
 import { fontsLoaded } from "./fonts";
 
 // Script: "ÚT CƯNG & CÔ IU – Birthday Recap 15.10", 30 s, 9:16.
-// Music is a 120 BPM bed whose first downbeat lands on 1.5 s, so every cut sits on a 0.5 s grid.
+// Song 1 (~120 BPM) enters on 1.5 s, so every cut sits on its 0.5 s beat grid; song 2 carries the ending.
 
 const clamp = {
   extrapolateLeft: "clamp",
@@ -112,7 +112,7 @@ export const BirthdayRecap: React.FC<{ readonly withMusic?: boolean }> = ({
         top="58%"
         size={68}
         tilt={0}
-        typewriter="Nhân vật chính: Lan Chi ✨"
+        typewriter="Nhân vật chính: Tui ✨"
       />
       <Label
         name="Level up"
@@ -488,26 +488,50 @@ export const BirthdayRecap: React.FC<{ readonly withMusic?: boolean }> = ({
 
       {/* ===== AUDIO ===== */}
       {withMusic ? (
-        <Audio
-          name="Music bed (120 BPM)"
-          src={staticFile("audio/music.wav")}
-          from={1 * fps}
-          volume={(f) =>
-            interpolate(
-              f + 1 * fps,
-              [
-                8.8 * fps,
-                9.1 * fps,
-                10.8 * fps,
-                11.1 * fps,
-                28 * fps,
-                30 * fps,
-              ],
-              [0.85, 0.18, 0.18, 0.85, 0.85, 0],
-              clamp,
-            )
-          }
-        />
+        <>
+          {/* Song 1 (~120 BPM, "Em bé của mẹ" clip): hook → wish wall */}
+          <Audio
+            name="Song 1 – body"
+            src={staticFile("audio/song1_em_be.wav")}
+            from={1.5 * fps}
+            // beat phase measured at 2.17 s into the clip
+            trimBefore={65}
+            durationInFrames={22.3 * fps}
+            volume={(f) =>
+              interpolate(
+                f + 1.5 * fps,
+                [
+                  1.5 * fps,
+                  1.6 * fps,
+                  8.8 * fps,
+                  9.1 * fps,
+                  10.8 * fps,
+                  11.1 * fps,
+                  23.3 * fps,
+                  23.8 * fps,
+                ],
+                [0.3, 0.9, 0.9, 0.18, 0.18, 0.9, 0.9, 0],
+                clamp,
+              )
+            }
+          />
+          {/* Song 2 (flowers clip): flowers → ending; its clip is cut at 16 s, so fade out before that */}
+          <Audio
+            name="Song 2 – ending"
+            src={staticFile("audio/song2_hoa.wav")}
+            from={23.3 * fps}
+            trimBefore={9.3 * fps}
+            durationInFrames={6.7 * fps}
+            volume={(f) =>
+              interpolate(
+                f + 23.3 * fps,
+                [23.3 * fps, 23.8 * fps, 28.6 * fps, 29.9 * fps],
+                [0, 0.95, 0.95, 0],
+                clamp,
+              )
+            }
+          />
+        </>
       ) : null}
       <Audio
         name="Real sound – hook"
