@@ -17,12 +17,15 @@ export const FPS = 30;
 const s = (sec: number) => Math.round(sec * FPS);
 const f = (name: string) => staticFile(`sinhnhat/${name}`);
 
-// Nhịp bài "Cứ vui lên": 130 BPM, điểm bùng nổ (giây 43.878 của bài) rơi đúng DROP.
-const BEAT = 0.4615;
+// Nhạc nền duy nhất: "Tình bạn diệu kỳ" (remix), 135 BPM.
+// Đoạn nhạc chuyển mạnh ở giây 15.306 của bài rơi đúng DROP ("…nhạc nổi lên!").
+const MUSIC_FILE = "tinhban.mp3";
+const MUSIC_SECTION = 15.306;
+
+const BEAT = 0.4444;
 const DROP = 16.0;
 const B = (k: number) => DROP + k * BEAT;
-const MUSIC2_START = 9.5;
-const MUSIC2_TRIM = 43.878 - (DROP - MUSIC2_START);
+const MUSIC_START = DROP - MUSIC_SECTION;
 
 export const TOTAL_SEC = B(36) + 0.5;
 export const DURATION = s(TOTAL_SEC);
@@ -289,8 +292,8 @@ const Flash: React.FC<{ dur: number; peak?: number }> = ({
 
 const YearCounter: React.FC = () => {
   const frame = useCurrentFrame();
-  const years = [2014, 2016, 2018, 2020, 2022, 2024];
-  const idx = Math.min(years.length - 1, Math.floor(frame / 3));
+  const years = [2014, 2017, 2020, 2023, 2026];
+  const idx = Math.min(years.length - 1, Math.floor(frame / 2.5));
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
       <div
@@ -445,19 +448,18 @@ export const SinhNhat: React.FC = () => {
     { start: DROP, end: B(5), el: <Clip src={f("V03.mp4")} trim={8} /> },
     // 10–16. Dựng nhanh theo nhịp
     { start: B(5), end: B(7), el: <Photo src={f("P17.jpg")} dur={s(2 * BEAT)} kb={{ from: 1.08, to: 1 }} /> },
-    { start: B(7), end: B(9), el: <Photo src={f("P34.jpg")} dur={s(2 * BEAT)} kb={{ from: 1, to: 1.08 }} /> },
-    { start: B(9), end: B(11), el: <Photo src={f("P26.jpg")} dur={s(2 * BEAT)} kb={{ from: 1.08, to: 1 }} /> },
-    { start: B(11), end: B(13), el: <Photo src={f("P11.jpg")} dur={s(2 * BEAT)} kb={{ from: 1, to: 1.08 }} /> },
-    { start: B(13), end: B(15), el: <Photo src={f("P08.jpg")} dur={s(2 * BEAT)} kb={{ from: 1.08, to: 1 }} /> },
+    { start: B(7), end: B(9), el: <Photo src={f("P26.jpg")} dur={s(2 * BEAT)} kb={{ from: 1.08, to: 1 }} /> },
+    { start: B(9), end: B(11), el: <Photo src={f("P11.jpg")} dur={s(2 * BEAT)} kb={{ from: 1, to: 1.08 }} /> },
+    { start: B(11), end: B(13), el: <Photo src={f("P08.jpg")} dur={s(2 * BEAT)} kb={{ from: 1.08, to: 1 }} /> },
     {
-      start: B(15),
-      end: B(18),
+      start: B(13),
+      end: B(16),
       el: <Clip src={f("V01.mp4")} trim={4} zoom={1.3} origin="50% 52%" />,
     },
     {
-      start: B(18),
+      start: B(16),
       end: B(21),
-      el: <Photo src={f("P12.jpg")} dur={s(3 * BEAT)} kb={{ from: 1.1, to: 1 }} />,
+      el: <Photo src={f("P06.jpg")} dur={s(5 * BEAT)} kb={{ from: 1, to: 1.08, origin: "50% 40%" }} />,
     },
     // 17–18. Kết
     {
@@ -526,7 +528,7 @@ export const SinhNhat: React.FC = () => {
       ),
     },
     {
-      at: 9.0,
+      at: 8.9,
       until: 9.5,
       el: () => <YearCounter />,
     },
@@ -557,10 +559,9 @@ export const SinhNhat: React.FC = () => {
       until: DROP,
       el: (d) => (
         <Caption y={170} size={78} anim="pop" dur={d}>
-          HỌP TỔ CHUYÊN MÔN
-          <div style={{ fontSize: 44, fontWeight: 700, marginTop: 6 }}>
-            (nghiêm túc lắm)
-          </div>
+          Ngồi cà phê thì
+          <br />
+          nghiêm túc lắm…
         </Caption>
       ),
     },
@@ -568,8 +569,10 @@ export const SinhNhat: React.FC = () => {
       at: DROP,
       until: B(5),
       el: (d) => (
-        <Caption y={150} size={130} anim="pop" dur={d} color={GOLD}>
-          TAN HỌP:
+        <Caption y={150} size={100} anim="pop" dur={d} color={GOLD}>
+          …cho tới khi
+          <br />
+          nhạc nổi lên! 💃
         </Caption>
       ),
     },
@@ -584,25 +587,16 @@ export const SinhNhat: React.FC = () => {
     },
     {
       at: B(7),
-      until: B(9),
+      until: B(11),
       el: (d) => (
         <Caption y={1640} size={66} anim="pop" dur={d}>
-          chụp hình chung,
+          chụp ảnh Tết chung,
         </Caption>
       ),
     },
     {
-      at: B(9),
+      at: B(11),
       until: B(13),
-      el: (d) => (
-        <Caption y={1640} size={66} anim="pop" dur={d}>
-          mặc áo dài chung,
-        </Caption>
-      ),
-    },
-    {
-      at: B(13),
-      until: B(15),
       el: (d) => (
         <Caption y={1640} size={66} anim="pop" dur={d}>
           quậy chung…
@@ -610,8 +604,8 @@ export const SinhNhat: React.FC = () => {
       ),
     },
     {
-      at: B(15),
-      until: B(18),
+      at: B(13),
+      until: B(16),
       el: (d) => (
         <Caption y={1640} size={66} anim="pop" dur={d}>
           nhảy cũng chung luôn!
@@ -619,7 +613,7 @@ export const SinhNhat: React.FC = () => {
       ),
     },
     {
-      at: B(18) + 0.1,
+      at: B(16) + 0.1,
       until: B(21),
       el: (d) => (
         <Caption y={1600} size={70} anim="fade" dur={d}>
@@ -681,15 +675,13 @@ export const SinhNhat: React.FC = () => {
     { at: B(26) - 0.03, dur: 8, peak: 0.95 },
   ];
 
-  const music1Vol = (fr: number) =>
-    interpolate(fr, [s(8.6), s(9.4)], [0.9, 0], clamp);
-  const music2Vol = (fr: number) => {
-    const t = fr / FPS + MUSIC2_START;
-    if (t < DROP) {
-      return interpolate(t, [MUSIC2_START, MUSIC2_START + 0.25, 14.0, 14.3, DROP - 0.1, DROP], [0, 0.85, 0.85, 0.4, 0.4, 1], clamp);
-    }
-    return interpolate(t, [B(18), B(19), B(21), B(22), TOTAL_SEC - 1.4, TOTAL_SEC], [1, 0.7, 0.7, 0.85, 0.85, 0], clamp);
-  };
+  const musicVol = (fr: number) =>
+    interpolate(
+      fr / FPS + MUSIC_START,
+      [0, 0.1, TOTAL_SEC - 1.5, TOTAL_SEC],
+      [0, 0.9, 0.9, 0],
+      clamp,
+    );
 
   return (
     <AbsoluteFill style={{ backgroundColor: "black" }}>
@@ -720,9 +712,8 @@ export const SinhNhat: React.FC = () => {
         </Sequence>
       ))}
 
-      <Audio src={f("tinhban.mp3")} durationInFrames={s(9.5)} volume={music1Vol} />
-      <Sequence from={s(MUSIC2_START)}>
-        <Audio src={f("cuvuilen.mp3")} trimBefore={s(MUSIC2_TRIM)} volume={music2Vol} />
+      <Sequence from={s(MUSIC_START)}>
+        <Audio src={f(MUSIC_FILE)} volume={musicVol} />
       </Sequence>
       {[0.12, 0.55, 1.0].map((t) => (
         <Sequence key={`tick-${t}`} from={s(t)}>
