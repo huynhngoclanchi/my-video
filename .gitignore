@@ -5,3 +5,7 @@ dist
 
 # Ignore the output video from Git but not videos you import into src/.
 out
+
+# Tư liệu cá nhân (ảnh, video, nhạc) — không đưa lên GitHub
+public/sinhnhat/
+out/

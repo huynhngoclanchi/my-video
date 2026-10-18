@@ -135,9 +135,9 @@ Nhạc gợi ý ở mục E. Mốc thời gian tính theo nhạc khoảng 120 nh
 **3. Ý nghĩa + "cà khịa" thân thiết**
 > *12 năm rồi. Học trò thành đồng nghiệp,*
 > *khách qua sông thành người chèo chung.*
-> *Chỉ có một thứ không đổi: đi đâu cũng bắt cô chụp hình cho.* 📸
+> *Chỉ có một thứ không đổi: đi đâu cô cũng bắt em chụp hình cho.* 📸
 > **Sinh nhật vui vẻ, [Tên]. Tuổi mới chèo khỏe nha!**
-*(Câu "bắt cô chụp hình cho" là câu đùa, cô đổi theo thói quen thật của hai người.)*
+*(Đã chốt theo ý cô: người bị "bắt" chụp hình là em.)*
 
 ---
 
