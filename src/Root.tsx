@@ -3,12 +3,22 @@ import { Composition, Folder } from "remotion";
 import { HelloWorld } from "./HelloWorld";
 import { Logo } from "./HelloWorld/Logo";
 import { Title } from "./HelloWorld/Title";
+import "./Birthday/fonts";
+import { Birthday, DURATION, FPS } from "./Birthday";
 
 // Each <Composition> is an entry in the sidebar!
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="Birthday12Nam"
+        component={Birthday}
+        durationInFrames={DURATION}
+        fps={FPS}
+        width={1080}
+        height={1920}
+      />
       <Folder name="Elements">
         <Composition
           id="Logo"
