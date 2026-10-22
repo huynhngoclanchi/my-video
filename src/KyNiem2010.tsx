@@ -424,7 +424,7 @@ const Clip: React.FC<{
   bottom?: React.ReactNode;
   volume?: number;
   tilt?: number;
-  zoom?: { to: number; origin: string }; // zoom cận cảnh
+  zoom?: { from?: number; to: number; origin: string; badge?: boolean }; // zoom cận cảnh
   nameTag?: React.ReactNode; // bảng tên người nói
 }> = ({ start, top, bottom, volume = 0.35, tilt = 0, zoom, nameTag }) => {
   const frame = useCurrentFrame();
@@ -459,7 +459,7 @@ const Clip: React.FC<{
             transformOrigin: zoom?.origin,
             scale: zoom
               ? String(
-                  interpolate(frame, [0, durationInFrames * 0.6], [1, zoom.to], {
+                  interpolate(frame, [0, durationInFrames * 0.6], [zoom.from ?? 1, zoom.to], {
                     ...clamp,
                     easing: Easing.bezier(0.33, 1, 0.68, 1),
                   }),
@@ -467,7 +467,7 @@ const Clip: React.FC<{
               : undefined,
           }}
         />
-        {zoom ? (
+        {zoom && zoom.badge !== false ? (
           <div
             style={{
               position: "absolute",
@@ -521,11 +521,11 @@ const Clip: React.FC<{
 
 // Mốc thời gian (giây) của các cảnh
 const CUTS = [
-  0, 2.5, 6, 9.6, 11.7, 13.2, 14.6, 16, 19.5, 22.5, 44.5, 51.2, 56.6, 59.6, 62.6, 65.6, 69.6, 74.1,
+  0, 2.5, 6, 9.6, 11.7, 13.2, 14.6, 16, 19.5, 22.5, 28, 31.5, 35, 38.5, 42, 45.5, 49, 52.5, 56, 59.5, 63, 66, 69, 73, 77.5,
 ];
 // Đoạn lời chúc: nhạc nền nhỏ lại để nghe rõ tiếng các bạn
 const WISH_START = 22.5;
-const WISH_END = 56.6;
+const WISH_END = 63;
 
 export const KyNiem2010: React.FC = () => {
   const { fps } = useVideoConfig();
@@ -574,25 +574,44 @@ export const KyNiem2010: React.FC = () => {
         <Clip start={50} tilt={1} top="Full lớp, full huy chương ✨" bottom="Và giờ là… lời chúc 💌" />
       </Sequence>
 
-      {/* Cảnh 7 (22.5–56.6s): Lời chúc của các bạn nam – giữ tiếng gốc */}
-      <Sequence name="7a. Lời chúc – Nguyễn Lộc" from={22.5 * fps} durationInFrames={22 * fps} premountFor={fps}>
-        <Clip start={66.6} volume={1} top={<>Mở màn lời chúc: <br />lớp trưởng lên sóng 🎤</>} nameTag={<>Nguyễn Lộc <br /><span style={{ fontSize: 30, color: PINK }}>Lớp trưởng 11A2 👑</span></>} bottom="Nói hay quá lớp trưởng ơi 👏" />
+      {/* Cảnh 7 (22.5–63s): 11 “anh tài” lần lượt lên sóng – giữ tiếng gốc */}
+      <Sequence name="7.1 Lời chúc – Nguyễn Lộc" from={22.5 * fps} durationInFrames={5.5 * fps} premountFor={fps}>
+        <Clip start={66.6} volume={1} top={<>Mở màn lời chúc: <br />lớp trưởng lên sóng 🎤</>} nameTag={<>Nguyễn Lộc <br /><span style={{ fontSize: 30, color: PINK }}>Lớp trưởng 11A2 👑</span></>} bottom="🎤 1/11" />
       </Sequence>
-      <Sequence name="7b. Lời chúc – bạn nam 2" from={44.5 * fps} durationInFrames={6.7 * fps} premountFor={fps}>
-        <Clip start={110.6} volume={1} tilt={-1} top={<>Lời chúc tiếp theo <br />đã được “cập bến” 💌</>} nameTag="Lời chúc từ “anh tài” 11A2 🎤" />
+      <Sequence name="7.2 Lời chúc – anh tài 2" from={28 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={110.8} volume={1} tilt={-1} top=<>Anh tài số 2 <br />cầm giấy, soạn kỹ lắm nha 📝</> bottom="🎤 2/11" />
       </Sequence>
-      <Sequence name="7c. Lời chúc – bạn nam 3" from={51.2 * fps} durationInFrames={5.4 * fps} premountFor={fps}>
-        <Clip start={144.4} volume={1} tilt={1} top={<>Run nhưng vẫn chúc <br />cho trọn vẹn nha 🫣</>} nameTag="Lời chúc từ “anh tài” 11A2 🎤" />
+      <Sequence name="7.3 Lời chúc – anh tài 3" from={31.5 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={144.4} volume={1} tilt={1} top=<>Anh tài số 3: <br />nụ cười tỏa nắng ☀️</> bottom="🎤 3/11" />
       </Sequence>
-
-      {/* Cảnh 8 (56.6–59.6s): Cổ vũ */}
-      <Sequence name="8. Cổ vũ" from={56.6 * fps} durationInFrames={3 * fps} premountFor={fps}>
-        <Clip start={237} volume={0.7} top="Bên dưới cổ vũ cháy phòng 🔥" bottom="Vỗ tay to lên nào 👏👏" />
+      <Sequence name="7.4 Lời chúc – anh tài 4" from={35 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={166.3} volume={1} tilt={-1} top=<>Anh tài số 4: <br />phong thái cực tự tin 😎</> bottom="🎤 4/11" />
+      </Sequence>
+      <Sequence name="7.5 Lời chúc – anh tài 5" from={38.5 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={188.5} volume={1} tilt={1} zoom={{ from: 1.7, to: 1.9, origin: "54% 47%", badge: false }} top=<>Anh tài số 5 <br />tiếp sóng liền tay 📡</> bottom="🎤 5/11" />
+      </Sequence>
+      <Sequence name="7.6 Lời chúc – anh tài 6" from={42 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={206.2} volume={1} tilt={-1} zoom={{ from: 1.7, to: 1.9, origin: "47% 47%", badge: false }} top=<>Anh tài số 6: <br />đứng thẳng, chúc thật lòng 💌</> bottom="🎤 6/11" />
+      </Sequence>
+      <Sequence name="7.7 Lời chúc – anh tài 7" from={45.5 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={223.5} volume={1} tilt={1} zoom={{ from: 1.7, to: 1.9, origin: "48% 47%", badge: false }} top=<>Anh tài số 7: <br />run nhẹ nhưng vẫn chúc 🫣</> bottom="🎤 7/11" />
+      </Sequence>
+      <Sequence name="7.8 Lời chúc – anh tài 8" from={49 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={242.8} volume={1} tilt={-1} zoom={{ from: 1.7, to: 1.9, origin: "53% 47%", badge: false }} top=<>Anh tài số 8: <br />lời chúc ngọt hơn trà sữa 🧋</> bottom="🎤 8/11" />
+      </Sequence>
+      <Sequence name="7.9 Lời chúc – anh tài 9" from={52.5 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={266.0} volume={1} tilt={1} zoom={{ from: 1.7, to: 1.9, origin: "52% 47%", badge: false }} top=<>Anh tài số 9: <br />hội chị em nghe mà tan chảy 🫠</> bottom="🎤 9/11" />
+      </Sequence>
+      <Sequence name="7.10 Lời chúc – anh tài 10" from={56 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={281.5} volume={1} tilt={-1} zoom={{ from: 1.7, to: 1.9, origin: "56% 47%", badge: false }} top=<>Anh tài số 10: <br />chúc gì dễ thương dữ vậy 🥹</> bottom="🎤 10/11" />
+      </Sequence>
+      <Sequence name="7.11 Lời chúc – anh tài 11" from={59.5 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={301.9} volume={1} tilt={1} zoom={{ from: 1.7, to: 1.9, origin: "54% 47%", badge: false }} top=<>Chốt hạ: anh tài số 11 <br />về đích rực rỡ 👑</> bottom="🎤 11/11" />
       </Sequence>
 
       {/* PHẦN 2 – Nhạc 2 (sâu lắng) */}
-      {/* Cảnh 9 (59.6–62.6s): Ảnh check-in */}
-      <Sequence name="9. Check-in" from={59.6 * fps} durationInFrames={3 * fps} premountFor={fps}>
+      {/* Cảnh 9 (63–66s): Ảnh check-in */}
+      <Sequence name="9. Check-in" from={63 * fps} durationInFrames={3 * fps} premountFor={fps}>
         <Sticker top={150} rotate={-3} bg="#fff3a8" size={58}>
           Chốt đơn tấm hình kỷ niệm 📸
         </Sticker>
@@ -602,8 +621,8 @@ export const KyNiem2010: React.FC = () => {
         </Sticker>
       </Sequence>
 
-      {/* Cảnh 10 (62.6–65.6s): Bắn tim */}
-      <Sequence name="10. Bắn tim" from={62.6 * fps} durationInFrames={3 * fps} premountFor={fps}>
+      {/* Cảnh 10 (66–69s): Bắn tim */}
+      <Sequence name="10. Bắn tim" from={66 * fps} durationInFrames={3 * fps} premountFor={fps}>
         <Sticker top={150} rotate={3} bg={PINK} color="white" size={58}>
           Bắn tim tới tấp 🫰🫰🫰
         </Sticker>
@@ -613,18 +632,18 @@ export const KyNiem2010: React.FC = () => {
         </Sticker>
       </Sequence>
 
-      {/* Cảnh 11 (65.6–69.6s): Huy chương */}
-      <Sequence name="11. Huy chương" from={65.6 * fps} durationInFrames={4 * fps} premountFor={fps}>
+      {/* Cảnh 11 (69–73s): Huy chương */}
+      <Sequence name="11. Huy chương" from={69 * fps} durationInFrames={4 * fps} premountFor={fps}>
         <MedalZoom />
       </Sequence>
 
-      {/* Cảnh 12 (69.6–74.1s): Ghép ảnh */}
-      <Sequence name="12. Ghép ảnh" from={69.6 * fps} durationInFrames={4.5 * fps} premountFor={fps}>
+      {/* Cảnh 12 (73–77.5s): Ghép ảnh */}
+      <Sequence name="12. Ghép ảnh" from={73 * fps} durationInFrames={4.5 * fps} premountFor={fps}>
         <Collage />
       </Sequence>
 
-      {/* Cảnh 13 (74.1–79.1s): Kết */}
-      <Sequence name="13. Kết" from={74.1 * fps} premountFor={fps}>
+      {/* Cảnh 13 (77.5–82.5s): Kết */}
+      <Sequence name="13. Kết" from={77.5 * fps} premountFor={fps}>
         <Outro />
       </Sequence>
 
