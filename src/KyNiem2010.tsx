@@ -424,9 +424,11 @@ const Clip: React.FC<{
   bottom?: React.ReactNode;
   volume?: number;
   tilt?: number;
-}> = ({ start, top, bottom, volume = 0.35, tilt = 0 }) => {
+  zoom?: { to: number; origin: string }; // zoom cận cảnh
+  nameTag?: React.ReactNode; // bảng tên người nói
+}> = ({ start, top, bottom, volume = 0.35, tilt = 0, zoom, nameTag }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, durationInFrames } = useVideoConfig();
   const enter = spring({ frame, fps, config: { damping: 14 } });
   return (
     <AbsoluteFill>
@@ -454,8 +456,56 @@ const Clip: React.FC<{
             height: "100%",
             objectFit: "cover",
             filter: "saturate(1.15) contrast(1.05)",
+            transformOrigin: zoom?.origin,
+            scale: zoom
+              ? String(
+                  interpolate(frame, [0, durationInFrames * 0.6], [1, zoom.to], {
+                    ...clamp,
+                    easing: Easing.bezier(0.33, 1, 0.68, 1),
+                  }),
+                )
+              : undefined,
           }}
         />
+        {zoom ? (
+          <div
+            style={{
+              position: "absolute",
+              top: 24,
+              right: 24,
+              background: "rgba(0,0,0,0.55)",
+              color: "white",
+              fontFamily: FONT,
+              fontWeight: 800,
+              fontSize: 34,
+              padding: "8px 18px",
+              borderRadius: 14,
+            }}
+          >
+            🔍 x{zoom.to}
+          </div>
+        ) : null}
+        {nameTag ? (
+          <div
+            style={{
+              position: "absolute",
+              left: 24,
+              bottom: 40,
+              background: "white",
+              color: DEEP,
+              fontFamily: FONT,
+              fontWeight: 900,
+              fontSize: 40,
+              padding: "14px 26px",
+              borderRadius: 18,
+              borderLeft: `14px solid ${PINK}`,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+              translate: `${interpolate(spring({ frame: frame - 8, fps, config: { damping: 14 } }), [0, 1], [-700, 0])}px 0px`,
+            }}
+          >
+            {nameTag}
+          </div>
+        ) : null}
       </div>
       <Sticker top={110} rotate={-3} bg="#fff3a8" size={50}>
         {top}
@@ -470,7 +520,12 @@ const Clip: React.FC<{
 };
 
 // Mốc thời gian (giây) của các cảnh
-const CUTS = [0, 2.5, 6, 10, 15, 18.5, 21.5, 23, 24.5, 26, 29, 32, 35, 39, 43.5];
+const CUTS = [
+  0, 2.5, 6, 9.6, 11.7, 13.2, 14.6, 16, 19.5, 22.5, 44.5, 51.2, 56.6, 59.6, 62.6, 65.6, 69.6, 74.1,
+];
+// Đoạn lời chúc: nhạc nền nhỏ lại để nghe rõ tiếng các bạn
+const WISH_START = 22.5;
+const WISH_END = 56.6;
 
 export const KyNiem2010: React.FC = () => {
   const { fps } = useVideoConfig();
@@ -490,45 +545,54 @@ export const KyNiem2010: React.FC = () => {
         <Clip start={0.5} top={<>Hậu trường: hội con trai <br />đang chuẩn bị “âm mưu” 🤫</>} bottom="Huy chương đã sẵn sàng 🏅" />
       </Sequence>
 
-      {/* Cảnh 3 (6–10s): Bất ngờ */}
-      <Sequence name="3. Bất ngờ" from={6 * fps} durationInFrames={4 * fps} premountFor={fps}>
-        <Clip start={4.5} volume={0.6} tilt={1} top="Bất ngờ chưa các bà! 😱" bottom="Hội chị em: ủa gì dị? 🙈" />
+      {/* Cảnh 3 (6–9.6s): Bất ngờ */}
+      <Sequence name="3. Bất ngờ" from={6 * fps} durationInFrames={3.6 * fps} premountFor={fps}>
+        <Clip start={4} volume={0.6} tilt={1} top="Bất ngờ chưa các bà! 😱" bottom="Hội chị em: ủa gì dị? 🙈" />
       </Sequence>
 
-      {/* Cảnh 4 (10–15s): Trao huy chương */}
-      <Sequence name="4. Trao huy chương" from={10 * fps} durationInFrames={5 * fps} premountFor={fps}>
-        <Clip start={16} tilt={-1} top={<>Giao huy chương <br />tận bàn, free ship 🛵</>} bottom="Ai cũng có phần nha 💝" />
+      {/* Cảnh 4 (9.6–16s): Cận cảnh đeo huy chương – 4 lát zoom */}
+      <Sequence name="4a. Zoom đeo huy chương" from={9.6 * fps} durationInFrames={2.1 * fps} premountFor={fps}>
+        <Clip start={7.4} zoom={{ to: 2, origin: "28% 55%" }} top={<>Zoom cận cảnh: <br />“cúi đầu xuống nè” 🏅</>} bottom="Ngại đỏ mặt luôn 🙈" />
+      </Sequence>
+      <Sequence name="4b. Zoom đeo huy chương" from={11.7 * fps} durationInFrames={1.5 * fps} premountFor={fps}>
+        <Clip start={9.8} tilt={-1} zoom={{ to: 1.7, origin: "62% 45%" }} top={<>Đeo tận cổ, <br />không cần tự lấy 😎</>} bottom="Chuẩn quý ông 11A2 🤵" />
+      </Sequence>
+      <Sequence name="4c. Zoom đeo huy chương" from={13.2 * fps} durationInFrames={1.4 * fps} premountFor={fps}>
+        <Clip start={11.8} tilt={1} zoom={{ to: 1.7, origin: "35% 60%" }} top={<>Tới lượt bạn này, <br />ai cũng có phần 💝</>} bottom="Giao huy chương tận bàn 🛵" />
+      </Sequence>
+      <Sequence name="4d. Zoom đeo huy chương" from={14.6 * fps} durationInFrames={1.4 * fps} premountFor={fps}>
+        <Clip start={22.6} tilt={-1} zoom={{ to: 1.7, origin: "50% 65%" }} top={<>Bạn nào cũng <br />được “đeo tận cổ” 🥰</>} bottom="Ai cũng có phần nha 💝" />
       </Sequence>
 
-      {/* Cảnh 5 (15–18.5s): Phản ứng */}
-      <Sequence name="5. Phản ứng" from={15 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+      {/* Cảnh 5 (16–19.5s): Phản ứng */}
+      <Sequence name="5. Phản ứng" from={16 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
         <Clip start={41} volume={0.6} top={<>Khi được gọi là <br />“bông hoa đẹp nhất” 🥹</>} bottom="Cười không thấy tổ quốc 😆" />
       </Sequence>
 
-      {/* Cảnh 6 (18.5–21.5s): Cả lớp */}
-      <Sequence name="6. Cả lớp" from={18.5 * fps} durationInFrames={3 * fps} premountFor={fps}>
-        <Clip start={50} tilt={1} top="Full lớp, full huy chương ✨" bottom="Đội hình 11A2 xuất hiện 💪" />
+      {/* Cảnh 6 (19.5–22.5s): Cả lớp */}
+      <Sequence name="6. Cả lớp" from={19.5 * fps} durationInFrames={3 * fps} premountFor={fps}>
+        <Clip start={50} tilt={1} top="Full lớp, full huy chương ✨" bottom="Và giờ là… lời chúc 💌" />
       </Sequence>
 
-      {/* Cảnh 7 (21.5–26s): Các “anh tài” lên sân khấu – 3 lát cắt nhanh */}
-      <Sequence name="7a. Anh tài 1" from={21.5 * fps} durationInFrames={1.5 * fps} premountFor={fps}>
-        <Clip start={72} top={<>Các “anh tài” 11A2 <br />lần lượt lên sân khấu 🎤</>} />
+      {/* Cảnh 7 (22.5–56.6s): Lời chúc của các bạn nam – giữ tiếng gốc */}
+      <Sequence name="7a. Lời chúc – Nguyễn Lộc" from={22.5 * fps} durationInFrames={22 * fps} premountFor={fps}>
+        <Clip start={66.6} volume={1} top={<>Mở màn lời chúc: <br />lớp trưởng lên sóng 🎤</>} nameTag={<>Nguyễn Lộc <br /><span style={{ fontSize: 30, color: PINK }}>Lớp trưởng 11A2 👑</span></>} bottom="Nói hay quá lớp trưởng ơi 👏" />
       </Sequence>
-      <Sequence name="7b. Anh tài 2" from={23 * fps} durationInFrames={1.5 * fps} premountFor={fps}>
-        <Clip start={128} tilt={-1} top={<>Các “anh tài” 11A2 <br />lần lượt lên sân khấu 🎤</>} />
+      <Sequence name="7b. Lời chúc – bạn nam 2" from={44.5 * fps} durationInFrames={6.7 * fps} premountFor={fps}>
+        <Clip start={110.6} volume={1} tilt={-1} top={<>Lời chúc tiếp theo <br />đã được “cập bến” 💌</>} nameTag="Lời chúc từ “anh tài” 11A2 🎤" />
       </Sequence>
-      <Sequence name="7c. Anh tài 3" from={24.5 * fps} durationInFrames={1.5 * fps} premountFor={fps}>
-        <Clip start={168} tilt={1} top={<>Các “anh tài” 11A2 <br />lần lượt lên sân khấu 🎤</>} bottom="Tự tin thôi, run nhẹ thôi 🫣" />
+      <Sequence name="7c. Lời chúc – bạn nam 3" from={51.2 * fps} durationInFrames={5.4 * fps} premountFor={fps}>
+        <Clip start={144.4} volume={1} tilt={1} top={<>Run nhưng vẫn chúc <br />cho trọn vẹn nha 🫣</>} nameTag="Lời chúc từ “anh tài” 11A2 🎤" />
       </Sequence>
 
-      {/* Cảnh 8 (26–29s): Cổ vũ */}
-      <Sequence name="8. Cổ vũ" from={26 * fps} durationInFrames={3 * fps} premountFor={fps}>
+      {/* Cảnh 8 (56.6–59.6s): Cổ vũ */}
+      <Sequence name="8. Cổ vũ" from={56.6 * fps} durationInFrames={3 * fps} premountFor={fps}>
         <Clip start={237} volume={0.7} top="Bên dưới cổ vũ cháy phòng 🔥" bottom="Vỗ tay to lên nào 👏👏" />
       </Sequence>
 
       {/* PHẦN 2 – Nhạc 2 (sâu lắng) */}
-      {/* Cảnh 9 (29–32s): Ảnh check-in */}
-      <Sequence name="9. Check-in" from={29 * fps} durationInFrames={3 * fps} premountFor={fps}>
+      {/* Cảnh 9 (59.6–62.6s): Ảnh check-in */}
+      <Sequence name="9. Check-in" from={59.6 * fps} durationInFrames={3 * fps} premountFor={fps}>
         <Sticker top={150} rotate={-3} bg="#fff3a8" size={58}>
           Chốt đơn tấm hình kỷ niệm 📸
         </Sticker>
@@ -538,29 +602,29 @@ export const KyNiem2010: React.FC = () => {
         </Sticker>
       </Sequence>
 
-      {/* Cảnh 10 (32–35s): Bắn tim */}
-      <Sequence name="10. Bắn tim" from={32 * fps} durationInFrames={3 * fps} premountFor={fps}>
+      {/* Cảnh 10 (62.6–65.6s): Bắn tim */}
+      <Sequence name="10. Bắn tim" from={62.6 * fps} durationInFrames={3 * fps} premountFor={fps}>
         <Sticker top={150} rotate={3} bg={PINK} color="white" size={58}>
           Bắn tim tới tấp 🫰🫰🫰
         </Sticker>
         <Polaroid src={staticFile("anh1.jpg")} top={480} rotate={3} caption="tim này là tim thật 💘" zoomFrom={1.12} zoomTo={1} />
         <Sticker top={1540} delay={20} rotate={-2} size={46}>
-          Cô ở giữa = “trùm cuối” dễ thương 😎
+          Ở giữa là cô – người “tưới hoa” <br />cho cả vườn hoa 11A2 🌷
         </Sticker>
       </Sequence>
 
-      {/* Cảnh 11 (35–39s): Huy chương */}
-      <Sequence name="11. Huy chương" from={35 * fps} durationInFrames={4 * fps} premountFor={fps}>
+      {/* Cảnh 11 (65.6–69.6s): Huy chương */}
+      <Sequence name="11. Huy chương" from={65.6 * fps} durationInFrames={4 * fps} premountFor={fps}>
         <MedalZoom />
       </Sequence>
 
-      {/* Cảnh 12 (39–43.5s): Ghép ảnh */}
-      <Sequence name="12. Ghép ảnh" from={39 * fps} durationInFrames={4.5 * fps} premountFor={fps}>
+      {/* Cảnh 12 (69.6–74.1s): Ghép ảnh */}
+      <Sequence name="12. Ghép ảnh" from={69.6 * fps} durationInFrames={4.5 * fps} premountFor={fps}>
         <Collage />
       </Sequence>
 
-      {/* Cảnh 13 (43.5–48.5s): Kết */}
-      <Sequence name="13. Kết" from={43.5 * fps} premountFor={fps}>
+      {/* Cảnh 13 (74.1–79.1s): Kết */}
+      <Sequence name="13. Kết" from={74.1 * fps} premountFor={fps}>
         <Outro />
       </Sequence>
 
@@ -571,8 +635,18 @@ export const KyNiem2010: React.FC = () => {
         </Sequence>
       ))}
 
-      {/* Nhạc: bài 1 lặp (0–29s) nối bài 2 (28.4–48.5s) */}
-      <Audio src={staticFile("nhac.mp3")} volume={0.85} />
+      {/* Nhạc: bài 1 (0–22s) nối bài 2 lặp đến hết; nhỏ lại khi các bạn đọc lời chúc */}
+      <Audio
+        src={staticFile("nhac.mp3")}
+        volume={(f) =>
+          interpolate(
+            f,
+            [WISH_START * fps - 15, WISH_START * fps, WISH_END * fps, WISH_END * fps + 15],
+            [0.85, 0.1, 0.1, 0.85],
+            clamp,
+          )
+        }
+      />
     </AbsoluteFill>
   );
 };
