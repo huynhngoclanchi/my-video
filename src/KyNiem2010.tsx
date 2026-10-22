@@ -1,4 +1,4 @@
-import { Audio } from "@remotion/media";
+import { Audio, Video } from "@remotion/media";
 import React from "react";
 import {
   AbsoluteFill,
@@ -417,6 +417,61 @@ const Outro: React.FC = () => {
   );
 };
 
+// Một đoạn cắt từ video lớp, đặt trong khung "story" kèm sticker chú thích
+const Clip: React.FC<{
+  start: number; // giây bắt đầu trong video gốc
+  top: React.ReactNode;
+  bottom?: React.ReactNode;
+  volume?: number;
+  tilt?: number;
+}> = ({ start, top, bottom, volume = 0.35, tilt = 0 }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const enter = spring({ frame, fps, config: { damping: 14 } });
+  return (
+    <AbsoluteFill>
+      <div
+        style={{
+          position: "absolute",
+          top: 300,
+          left: 160,
+          width: 760,
+          height: 1351,
+          borderRadius: 40,
+          overflow: "hidden",
+          border: "12px solid white",
+          boxShadow: `0 0 0 8px ${PINK}, 0 30px 80px rgba(122,31,92,0.4)`,
+          rotate: `${tilt}deg`,
+          scale: String(interpolate(enter, [0, 1], [0.9, 1])),
+        }}
+      >
+        <Video
+          src={staticFile("lop.mp4")}
+          trimBefore={Math.round(start * fps)}
+          volume={volume}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "saturate(1.15) contrast(1.05)",
+          }}
+        />
+      </div>
+      <Sticker top={110} rotate={-3} bg="#fff3a8" size={50}>
+        {top}
+      </Sticker>
+      {bottom ? (
+        <Sticker top={1630} delay={12} rotate={2} bg={PINK} color="white" size={46}>
+          {bottom}
+        </Sticker>
+      ) : null}
+    </AbsoluteFill>
+  );
+};
+
+// Mốc thời gian (giây) của các cảnh
+const CUTS = [0, 2.5, 6, 10, 15, 18.5, 21.5, 23, 24.5, 26, 29, 32, 35, 39, 43.5];
+
 export const KyNiem2010: React.FC = () => {
   const { fps } = useVideoConfig();
   return (
@@ -424,15 +479,58 @@ export const KyNiem2010: React.FC = () => {
       <Background />
       <FloatingPetals />
 
+      {/* PHẦN 1 – Nhạc 1 (vui nhộn) */}
       {/* Cảnh 1 (0–2.5s): Mở đầu */}
       <Sequence name="1. Mở đầu" durationInFrames={2.5 * fps} premountFor={fps}>
         <Intro />
       </Sequence>
 
-      {/* Cảnh 2 (2.5–5.5s): Ảnh check-in */}
-      <Sequence name="2. Check-in" from={2.5 * fps} durationInFrames={3 * fps} premountFor={fps}>
+      {/* Cảnh 2 (2.5–6s): Hậu trường */}
+      <Sequence name="2. Hậu trường" from={2.5 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={0.5} top={<>Hậu trường: hội con trai <br />đang chuẩn bị “âm mưu” 🤫</>} bottom="Huy chương đã sẵn sàng 🏅" />
+      </Sequence>
+
+      {/* Cảnh 3 (6–10s): Bất ngờ */}
+      <Sequence name="3. Bất ngờ" from={6 * fps} durationInFrames={4 * fps} premountFor={fps}>
+        <Clip start={4.5} volume={0.6} tilt={1} top="Bất ngờ chưa các bà! 😱" bottom="Hội chị em: ủa gì dị? 🙈" />
+      </Sequence>
+
+      {/* Cảnh 4 (10–15s): Trao huy chương */}
+      <Sequence name="4. Trao huy chương" from={10 * fps} durationInFrames={5 * fps} premountFor={fps}>
+        <Clip start={16} tilt={-1} top={<>Giao huy chương <br />tận bàn, free ship 🛵</>} bottom="Ai cũng có phần nha 💝" />
+      </Sequence>
+
+      {/* Cảnh 5 (15–18.5s): Phản ứng */}
+      <Sequence name="5. Phản ứng" from={15 * fps} durationInFrames={3.5 * fps} premountFor={fps}>
+        <Clip start={41} volume={0.6} top={<>Khi được gọi là <br />“bông hoa đẹp nhất” 🥹</>} bottom="Cười không thấy tổ quốc 😆" />
+      </Sequence>
+
+      {/* Cảnh 6 (18.5–21.5s): Cả lớp */}
+      <Sequence name="6. Cả lớp" from={18.5 * fps} durationInFrames={3 * fps} premountFor={fps}>
+        <Clip start={50} tilt={1} top="Full lớp, full huy chương ✨" bottom="Đội hình 11A2 xuất hiện 💪" />
+      </Sequence>
+
+      {/* Cảnh 7 (21.5–26s): Các “anh tài” lên sân khấu – 3 lát cắt nhanh */}
+      <Sequence name="7a. Anh tài 1" from={21.5 * fps} durationInFrames={1.5 * fps} premountFor={fps}>
+        <Clip start={72} top={<>Các “anh tài” 11A2 <br />lần lượt lên sân khấu 🎤</>} />
+      </Sequence>
+      <Sequence name="7b. Anh tài 2" from={23 * fps} durationInFrames={1.5 * fps} premountFor={fps}>
+        <Clip start={128} tilt={-1} top={<>Các “anh tài” 11A2 <br />lần lượt lên sân khấu 🎤</>} />
+      </Sequence>
+      <Sequence name="7c. Anh tài 3" from={24.5 * fps} durationInFrames={1.5 * fps} premountFor={fps}>
+        <Clip start={168} tilt={1} top={<>Các “anh tài” 11A2 <br />lần lượt lên sân khấu 🎤</>} bottom="Tự tin thôi, run nhẹ thôi 🫣" />
+      </Sequence>
+
+      {/* Cảnh 8 (26–29s): Cổ vũ */}
+      <Sequence name="8. Cổ vũ" from={26 * fps} durationInFrames={3 * fps} premountFor={fps}>
+        <Clip start={237} volume={0.7} top="Bên dưới cổ vũ cháy phòng 🔥" bottom="Vỗ tay to lên nào 👏👏" />
+      </Sequence>
+
+      {/* PHẦN 2 – Nhạc 2 (sâu lắng) */}
+      {/* Cảnh 9 (29–32s): Ảnh check-in */}
+      <Sequence name="9. Check-in" from={29 * fps} durationInFrames={3 * fps} premountFor={fps}>
         <Sticker top={150} rotate={-3} bg="#fff3a8" size={58}>
-          Điểm danh hội chị em 11A2 ✌️
+          Chốt đơn tấm hình kỷ niệm 📸
         </Sticker>
         <Polaroid src={staticFile("anh3.jpg")} top={480} rotate={-3} caption="đủ quân số, đủ visual ✨" />
         <Sticker top={1540} delay={20} rotate={2} size={46}>
@@ -440,8 +538,8 @@ export const KyNiem2010: React.FC = () => {
         </Sticker>
       </Sequence>
 
-      {/* Cảnh 3 (5.5–8.5s): Bắn tim */}
-      <Sequence name="3. Bắn tim" from={5.5 * fps} durationInFrames={3 * fps} premountFor={fps}>
+      {/* Cảnh 10 (32–35s): Bắn tim */}
+      <Sequence name="10. Bắn tim" from={32 * fps} durationInFrames={3 * fps} premountFor={fps}>
         <Sticker top={150} rotate={3} bg={PINK} color="white" size={58}>
           Bắn tim tới tấp 🫰🫰🫰
         </Sticker>
@@ -451,39 +549,30 @@ export const KyNiem2010: React.FC = () => {
         </Sticker>
       </Sequence>
 
-      {/* Cảnh 4 (8.5–11s): Thả tim khổng lồ, chuyển nhạc */}
-      <Sequence name="4. Tim khổng lồ" from={8.5 * fps} durationInFrames={2.5 * fps} premountFor={fps}>
-        <Sticker top={150} rotate={-2} bg="#fff3a8" size={58}>
-          Combo thả tim x1000 💗
-        </Sticker>
-        <Polaroid src={staticFile("anh2.jpg")} top={480} rotate={-2} caption="tình chị em là có thật 🫶" />
-      </Sequence>
-
-      {/* Cảnh 5 (11–15s): Huy chương */}
-      <Sequence name="5. Huy chương" from={11 * fps} durationInFrames={4 * fps} premountFor={fps}>
+      {/* Cảnh 11 (35–39s): Huy chương */}
+      <Sequence name="11. Huy chương" from={35 * fps} durationInFrames={4 * fps} premountFor={fps}>
         <MedalZoom />
       </Sequence>
 
-      {/* Cảnh 6 (15–20s): Ghép ảnh */}
-      <Sequence name="6. Ghép ảnh" from={15 * fps} durationInFrames={5 * fps} premountFor={fps}>
+      {/* Cảnh 12 (39–43.5s): Ghép ảnh */}
+      <Sequence name="12. Ghép ảnh" from={39 * fps} durationInFrames={4.5 * fps} premountFor={fps}>
         <Collage />
       </Sequence>
 
-      {/* Cảnh 7 (20–25.3s): Kết */}
-      <Sequence name="7. Kết" from={20 * fps} premountFor={fps}>
+      {/* Cảnh 13 (43.5–48.5s): Kết */}
+      <Sequence name="13. Kết" from={43.5 * fps} premountFor={fps}>
         <Outro />
       </Sequence>
 
       {/* Chớp chuyển cảnh */}
-      <Sequence from={2.5 * fps} durationInFrames={10}><Flash /></Sequence>
-      <Sequence from={5.5 * fps} durationInFrames={10}><Flash /></Sequence>
-      <Sequence from={8.5 * fps} durationInFrames={10}><Flash /></Sequence>
-      <Sequence from={11 * fps} durationInFrames={10}><Flash /></Sequence>
-      <Sequence from={15 * fps} durationInFrames={10}><Flash /></Sequence>
-      <Sequence from={20 * fps} durationInFrames={10}><Flash /></Sequence>
+      {CUTS.slice(1).map((t) => (
+        <Sequence key={t} from={Math.round(t * fps)} durationInFrames={10}>
+          <Flash />
+        </Sequence>
+      ))}
 
-      {/* Nhạc: bài 1 (0–11s) nối bài 2 (10–25.3s) */}
-      <Audio src={staticFile("nhac.mp3")} />
+      {/* Nhạc: bài 1 lặp (0–29s) nối bài 2 (28.4–48.5s) */}
+      <Audio src={staticFile("nhac.mp3")} volume={0.85} />
     </AbsoluteFill>
   );
 };
